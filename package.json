@@ -1,0 +1,20 @@
+{
+  "name": "full-screen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify client/application.js -o public/js/application.js",
+    "watch": "watchify client/application.js -o public/js/application.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "browserify": "^11.0.0",
+    "domready": "^1.0.8",
+    "ecstatic": "^0.8.0",
+    "stack": "^0.1.0",
+    "watchify": "^3.3.0"
+  }
+}
