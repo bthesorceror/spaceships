@@ -5,6 +5,24 @@ body {
   overflow: hidden;
 }
 
+#fullscreenToggle {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  right: 5px;
+  top: 25px;
+  background-size: 32px 32px;
+  cursor: pointer;
+}
+
+#fullscreenToggle.enterFullscreen {
+  background-image: url(/images/fullscreen.png);
+}
+
+#fullscreenToggle.exitFullscreen {
+  background-image: url(/images/exitfullscreen.png);
+}
+
 canvas {
   display: block;
 }
