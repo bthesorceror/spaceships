@@ -1,31 +1,9 @@
-var domready = require('domready');
-
-var inherits     = require('util').inherits;
-var EventEmitter = require('events').EventEmitter;
-
-inherits(FullScreenToggle, EventEmitter);
-
-function FullScreenToggle() {
-  EventEmitter.call(this);
-}
-
-FullScreenToggle.prototype.isFullScreen = function() {
-  return document.webkitFullscreenElement;
-}
-
-FullScreenToggle.prototype.toggle = function() {
-  if (this.isFullScreen()) {
-    document.webkitExitFullscreen();
-    this.emit('off');
-  } else {
-    document.documentElement.webkitRequestFullscreen();
-    this.emit('on');
-  }
-}
+var domready         = require('domready');
+var FullscreenToggle = require('./fullscreen_toggle');
 
 function setupToggle() {
   var button = document.querySelector('#fullscreenToggle');
-  var toggle = new FullScreenToggle();
+  var toggle = new FullscreenToggle();
 
   toggle.on('on', function() {
     button.classList.add('exitFullscreen');
@@ -40,6 +18,13 @@ function setupToggle() {
   button.addEventListener('mouseup', toggle.toggle.bind(toggle));
 }
 
+function getCenter() {
+  var centerX = window.innerWidth / 2;
+  var centerY = window.innerHeight / 2;
+
+  return { x: centerX, y: centerY };
+}
+
 domready(function() {
   var canvas  = document.querySelector('#gameScreen');
   var context = canvas.getContext('2d');
@@ -47,15 +32,15 @@ domready(function() {
   setupToggle();
 
   function draw() {
-    var centerX = window.innerWidth / 2;
-    var centerY = window.innerHeight / 2;
+    var center = getCenter();
 
     context.save();
     context.fillStyle = '#00F';
-    context.translate(centerX, centerY);
+    context.translate(center.x, center.y);
     context.beginPath();
     context.moveTo(0, -20);
     context.lineTo(20, 20);
+    context.lineTo(0, 10);
     context.lineTo(-20, 20);
     context.closePath();
     context.fill();
@@ -67,13 +52,16 @@ domready(function() {
     canvas.setAttribute('height', window.innerHeight);
   }
 
-  function onResize() {
+  function resizeAndDraw() {
     setDimensions();
     draw();
   }
 
+  function onResize() {
+    resizeAndDraw();
+  }
+
   window.addEventListener('resize', onResize);
 
-  setDimensions();
-  draw();
+  resizeAndDraw();
 });
