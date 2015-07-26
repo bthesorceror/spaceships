@@ -30,10 +30,14 @@ domready(function() {
   var canvas   = document.querySelector('#gameScreen');
   var context  = canvas.getContext('2d');
   var keys     = arcadeKeys.keys;
-  var ak       = arcadeKeys([keys.left, keys.right]);
+  var ak       = arcadeKeys([keys.left, keys.right, keys.down, keys.up]);
 
   var rotation      = 0;
   var rotationSpeed = 3;
+
+  var moveVector = { x: 0, y: 0 };
+  var position   = { x: 200, y: 200 };
+  var centeredOn = { x: 200, y: 200 };
 
   setupToggle();
 
@@ -41,12 +45,20 @@ domready(function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
   }
 
-  function draw() {
+  function getTranslated(position) {
     var center = getCenter();
+    var x = center.x + (position.x - centeredOn.x);
+    var y = center.y + (position.y - centeredOn.y);
+
+    return { x: x, y: y };
+  }
+
+  function drawShip() {
+    var pos = getTranslated(position);
 
     context.save();
     context.fillStyle = '#00F';
-    context.translate(center.x, center.y);
+    context.translate(pos.x, pos.y);
     context.beginPath();
     context.rotate(rotation * (Math.PI / 180));
     context.moveTo(0, -20);
@@ -58,7 +70,11 @@ domready(function() {
     context.restore();
   }
 
-  function update() {
+  function draw() {
+    drawShip();
+  }
+
+  function handleRotation() {
     if (ak.isPressed(keys.left)) {
       rotation -= rotationSpeed;
     }
@@ -67,7 +83,19 @@ domready(function() {
       rotation += rotationSpeed;
     }
 
+    if (ak.isPressed(keys.up)) {
+      position.y -= 3;
+    }
+
+    if (ak.isPressed(keys.down)) {
+      position.y += 3;
+    }
+
     rotation %= 360;
+  }
+
+  function update() {
+    handleRotation();
   }
 
   function setDimensions() {
