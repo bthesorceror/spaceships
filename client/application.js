@@ -1,4 +1,5 @@
 var domready         = require('domready');
+var arcadeKeys       = require('arcade_keys');
 var FullscreenToggle = require('./fullscreen_toggle');
 
 function setupToggle() {
@@ -26,10 +27,19 @@ function getCenter() {
 }
 
 domready(function() {
-  var canvas  = document.querySelector('#gameScreen');
-  var context = canvas.getContext('2d');
+  var canvas   = document.querySelector('#gameScreen');
+  var context  = canvas.getContext('2d');
+  var keys     = arcadeKeys.keys;
+  var ak       = arcadeKeys([keys.left, keys.right]);
+
+  var rotation      = 0;
+  var rotationSpeed = 3;
 
   setupToggle();
+
+  function clear() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+  }
 
   function draw() {
     var center = getCenter();
@@ -38,6 +48,7 @@ domready(function() {
     context.fillStyle = '#00F';
     context.translate(center.x, center.y);
     context.beginPath();
+    context.rotate(rotation * (Math.PI / 180));
     context.moveTo(0, -20);
     context.lineTo(20, 20);
     context.lineTo(0, 10);
@@ -47,21 +58,37 @@ domready(function() {
     context.restore();
   }
 
+  function update() {
+    if (ak.isPressed(keys.left)) {
+      rotation -= rotationSpeed;
+    }
+
+    if (ak.isPressed(keys.right)) {
+      rotation += rotationSpeed;
+    }
+
+    rotation %= 360;
+  }
+
   function setDimensions() {
     canvas.setAttribute('width', window.innerWidth);
     canvas.setAttribute('height', window.innerHeight);
   }
 
-  function resizeAndDraw() {
+  function onResize() {
     setDimensions();
-    draw();
   }
 
-  function onResize() {
-    resizeAndDraw();
+  function loop() {
+    window.requestAnimationFrame(loop)
+
+    clear();
+    update();
+    draw();
   }
 
   window.addEventListener('resize', onResize);
 
-  resizeAndDraw();
+  setDimensions();
+  loop();
 });
