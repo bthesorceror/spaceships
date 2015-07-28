@@ -26,6 +26,10 @@ function getCenter() {
   return { x: centerX, y: centerY };
 }
 
+var rocks = [
+  { x: 200, y: 100, color: '#F00', rotation: 0 }
+];
+
 domready(function() {
   var canvas   = document.querySelector('#gameScreen');
   var context  = canvas.getContext('2d');
@@ -37,7 +41,6 @@ domready(function() {
 
   var moveVector = { x: 0, y: 0 };
   var position   = { x: 200, y: 200 };
-  var centeredOn = { x: 200, y: 200 };
 
   setupToggle();
 
@@ -45,8 +48,14 @@ domready(function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
   }
 
+  function getCenteredOn() {
+    return position;
+  }
+
   function getTranslated(position) {
     var center = getCenter();
+    var centeredOn = getCenteredOn();
+
     var x = center.x + (position.x - centeredOn.x);
     var y = center.y + (position.y - centeredOn.y);
 
@@ -70,8 +79,35 @@ domready(function() {
     context.restore();
   }
 
+  function drawRock(rock) {
+    var pos = getTranslated(rock);
+
+    var size = 10;
+
+    context.save();
+    context.fillStyle = rock.color;
+    context.translate(pos.x, pos.y);
+    context.beginPath();
+
+    context.rotate(rock.rotation * (Math.PI / 180));
+
+    context.moveTo(-size, -size);
+    context.lineTo(-size, size);
+    context.lineTo(size, size);
+    context.lineTo(size, -size);
+
+    context.closePath();
+    context.fill();
+    context.restore();
+  }
+
+  function drawRocks() {
+    rocks.forEach(drawRock);
+  }
+
   function draw() {
     drawShip();
+    drawRocks();
   }
 
   function handleRotation() {
@@ -94,8 +130,17 @@ domready(function() {
     rotation %= 360;
   }
 
+  function updateRock(rock) {
+    rock.rotation = (rock.rotation + 1) % 360;
+  }
+
+  function updateRocks() {
+    rocks.forEach(updateRock);
+  }
+
   function update() {
     handleRotation();
+    updateRocks();
   }
 
   function setDimensions() {
