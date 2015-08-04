@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "browserify client/application.js -o public/js/application.js",
-    "watch": "watchify client/application.js -o public/js/application.js"
+    "build": "mkdir -p public/js && browserify client/application.js -o public/js/application.js",
+    "watch": "mkdir -p public/js && watchify client/application.js -o public/js/application.js"
   },
   "author": "",
   "license": "ISC",
