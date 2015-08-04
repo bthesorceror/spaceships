@@ -1,6 +1,7 @@
 var domready         = require('domready');
 var arcadeKeys       = require('arcade_keys');
 var FullscreenToggle = require('./fullscreen_toggle');
+var Screen           = require('./screen');
 
 function setupToggle() {
   var button = document.querySelector('#fullscreenToggle');
@@ -19,15 +20,10 @@ function setupToggle() {
   button.addEventListener('mouseup', toggle.toggle.bind(toggle));
 }
 
-function getCenter() {
-  var centerX = window.innerWidth / 2;
-  var centerY = window.innerHeight / 2;
-
-  return { x: centerX, y: centerY };
-}
-
 var rocks = [
-  { x: 200, y: 100, color: '#F00', rotation: 0 }
+  { x: 200, y: 100, color: '#F00', rotation: 0, speed: 10 },
+  { x: 100, y: 400, color: '#FF0', rotation: 40, speed: 3 },
+  { x: 400, y: 400, color: '#F0F', rotation: 0, speed: 1}
 ];
 
 domready(function() {
@@ -39,66 +35,50 @@ domready(function() {
   var rotation      = 0;
   var rotationSpeed = 3;
 
+  var screen = new Screen(canvas);
+  screen.setCenteredOn(200, 200);
+
   var moveVector = { x: 0, y: 0 };
   var position   = { x: 200, y: 200 };
 
   setupToggle();
 
-  function clear() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-  }
-
-  function getCenteredOn() {
-    return position;
-  }
-
-  function getTranslated(position) {
-    var center = getCenter();
-    var centeredOn = getCenteredOn();
-
-    var x = center.x + (position.x - centeredOn.x);
-    var y = center.y + (position.y - centeredOn.y);
-
-    return { x: x, y: y };
-  }
-
   function drawShip() {
-    var pos = getTranslated(position);
+    screen.draw(function(context) {
+      var pos = this.getTranslatedPosition(position);
 
-    context.save();
-    context.fillStyle = '#00F';
-    context.translate(pos.x, pos.y);
-    context.beginPath();
-    context.rotate(rotation * (Math.PI / 180));
-    context.moveTo(0, -20);
-    context.lineTo(20, 20);
-    context.lineTo(0, 10);
-    context.lineTo(-20, 20);
-    context.closePath();
-    context.fill();
-    context.restore();
+      context.fillStyle = '#00F';
+      context.translate(pos.x, pos.y);
+      context.beginPath();
+      context.rotate(rotation * (Math.PI / 180));
+      context.moveTo(0, -20);
+      context.lineTo(20, 20);
+      context.lineTo(0, 10);
+      context.lineTo(-20, 20);
+      context.closePath();
+      context.fill();
+    });
   }
 
   function drawRock(rock) {
-    var pos = getTranslated(rock);
-
     var size = 10;
+    screen.draw(function(context) {
+      var pos = this.getTranslatedPosition(rock);
 
-    context.save();
-    context.fillStyle = rock.color;
-    context.translate(pos.x, pos.y);
-    context.beginPath();
+      context.fillStyle = rock.color;
+      context.translate(pos.x, pos.y);
+      context.beginPath();
 
-    context.rotate(rock.rotation * (Math.PI / 180));
+      context.rotate(rock.rotation * (Math.PI / 180));
 
-    context.moveTo(-size, -size);
-    context.lineTo(-size, size);
-    context.lineTo(size, size);
-    context.lineTo(size, -size);
+      context.moveTo(-size, -size);
+      context.lineTo(-size, size);
+      context.lineTo(size, size);
+      context.lineTo(size, -size);
 
-    context.closePath();
-    context.fill();
-    context.restore();
+      context.closePath();
+      context.fill();
+    });
   }
 
   function drawRocks() {
@@ -121,17 +101,19 @@ domready(function() {
 
     if (ak.isPressed(keys.up)) {
       position.y -= 3;
+      screen.changeCenteredOn(0, -3);
     }
 
     if (ak.isPressed(keys.down)) {
       position.y += 3;
+      screen.changeCenteredOn(0, 3);
     }
 
     rotation %= 360;
   }
 
   function updateRock(rock) {
-    rock.rotation = (rock.rotation + 1) % 360;
+    rock.rotation = (rock.rotation + rock.speed) % 360;
   }
 
   function updateRocks() {
@@ -144,23 +126,17 @@ domready(function() {
   }
 
   function setDimensions() {
-    canvas.setAttribute('width', window.innerWidth);
-    canvas.setAttribute('height', window.innerHeight);
-  }
-
-  function onResize() {
-    setDimensions();
+    screen.setDimensions(window.innerWidth, window.innerHeight);
   }
 
   function loop() {
     window.requestAnimationFrame(loop)
-
-    clear();
+    screen.clear();
     update();
     draw();
   }
 
-  window.addEventListener('resize', onResize);
+  window.addEventListener('resize', setDimensions);
 
   setDimensions();
   loop();
