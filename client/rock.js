@@ -28,10 +28,14 @@ Rock.prototype.draw = function(screen) {
 
     context.rotate(self.rotation * (Math.PI / 180));
 
-    context.moveTo(-self.size, -self.size);
-    context.lineTo(-self.size, self.size);
-    context.lineTo(self.size, self.size);
-    context.lineTo(self.size, -self.size);
+    context.moveTo(-(self.size / 2), -self.size);
+    context.lineTo(self.size / 2, -self.size);
+    context.lineTo(self.size, -self.size / 2);
+    context.lineTo(self.size, self.size / 2);
+    context.lineTo(self.size / 2, self.size);
+    context.lineTo(-(self.size / 2), self.size);
+    context.lineTo(-self.size, self.size / 2);
+    context.lineTo(-self.size, -self.size / 2);
 
     context.closePath();
     context.fill();

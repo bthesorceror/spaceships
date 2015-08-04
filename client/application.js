@@ -45,30 +45,14 @@ domready(function() {
 
   setupToggle();
 
-  function drawRock(rock) {
-    rock.draw(screen);
-  }
-
-  function drawRocks() {
-    rocks.forEach(drawRock);
-  }
-
   function draw() {
     ship.draw(screen);
-    drawRocks();
-  }
-
-  function updateRock(rock) {
-    rock.update();
-  }
-
-  function updateRocks() {
-    rocks.forEach(updateRock);
+    rocks.forEach(function(r) { r.draw(screen) });
   }
 
   function update() {
     ship.update();
-    updateRocks();
+    rocks.forEach(function(r) { r.update() });
   }
 
   function setDimensions() {
