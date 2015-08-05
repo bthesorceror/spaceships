@@ -7,6 +7,20 @@ inherits(FullscreenToggle, EventEmitter);
 
 function FullscreenToggle() {
   EventEmitter.call(this);
+
+  var self = this;
+
+  window.addEventListener('resize', function() {
+    self.signalChange();
+  });
+}
+
+FullscreenToggle.prototype.signalChange = function() {
+  if (this.isFullscreen()) {
+    this.emit('on');
+  } else {
+    this.emit('off');
+  }
 }
 
 FullscreenToggle.prototype.isFullscreen = function() {
@@ -16,10 +30,8 @@ FullscreenToggle.prototype.isFullscreen = function() {
 FullscreenToggle.prototype.toggle = function() {
   if (this.isFullscreen()) {
     document.webkitExitFullscreen();
-    this.emit('off');
   } else {
     document.documentElement.webkitRequestFullscreen();
-    this.emit('on');
   }
 }
 
