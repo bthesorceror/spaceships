@@ -4,7 +4,7 @@ module.exports = [
     y: 100,
     color: '#F00',
     rotation: 0,
-    rotationSpeed: 10,
+    rotationSpeed: 2,
     size: 10
   },
   {

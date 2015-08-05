@@ -4,6 +4,7 @@ var FullscreenToggle = require('./fullscreen_toggle');
 var Screen           = require('./screen');
 var Ship             = require('./ship');
 var Rock             = require('./rock');
+var collision        = require('./collision');
 
 function setupToggle() {
   var button = document.querySelector('#fullscreenToggle');
@@ -59,10 +60,19 @@ domready(function() {
     screen.setDimensions(window.innerWidth, window.innerHeight);
   }
 
+  function checkCollisions() {
+    rocks.forEach(function(rock) {
+      if (collision(ship, rock)) {
+        console.dir('Collision detected');
+      }
+    });
+  }
+
   function loop() {
     window.requestAnimationFrame(loop)
     screen.clear();
     update();
+    checkCollisions();
     draw();
   }
 

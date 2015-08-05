@@ -11,6 +11,11 @@ Screen.prototype.clear = function() {
     0, 0, this.canvas.width, this.canvas.height);
 }
 
+Screen.prototype.getPixelData = function() {
+  return this.context.getImageData(
+    0, 0, this.getWidth(), this.getHeight()).data;
+}
+
 Screen.prototype.setHeight = function(height) {
   this.canvas.setAttribute('height', height);
 }

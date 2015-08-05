@@ -16,6 +16,14 @@ Rock.prototype.setAttributesFromData = function(data) {
   this.size          = data.size;
 }
 
+Rock.prototype.width = function() {
+  return this.size * 3;
+}
+
+Rock.prototype.height = function() {
+  return this.size * 3;
+}
+
 Rock.prototype.draw = function(screen) {
   var self = this;
 
