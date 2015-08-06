@@ -4,6 +4,7 @@ var FullscreenToggle = require('./fullscreen_toggle');
 var Screen           = require('./screen');
 var Ship             = require('./ship');
 var Rock             = require('./rock');
+var collision        = require('./collision');
 
 function setupToggle() {
   var button = document.querySelector('#fullscreenToggle');
@@ -157,7 +158,7 @@ domready(function() {
 
   function checkCollisions() {
     rocks.forEach(function(rock) {
-      if (ship.collidesWithRock(rock)) {
+      if (collision(ship, rock)) {
         console.dir('Collision detected');
       }
     });

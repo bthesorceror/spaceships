@@ -33,6 +33,10 @@ Rock.prototype.boundingBox = function() {
   return boundingBox(this);
 }
 
+Rock.prototype.drawCollision = function(screen) {
+  this.draw(screen);
+}
+
 Rock.prototype.draw = function(screen) {
   var self = this;
 

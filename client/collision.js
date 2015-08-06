@@ -18,12 +18,12 @@ function collision(obj1, obj2, obj1Options) {
   screen.setCenteredOn(obj1.position.x, obj1.position.y);
   screen.setDimensions(obj1.width(), obj1.height());
 
-  obj1.draw(screen, obj1Options);
+  obj1.drawCollision(screen);
   var pixelData1 = screen.getPixelData();
 
   screen.clear();
 
-  obj2.draw(screen);
+  obj2.drawCollision(screen);
   var pixelData2 = screen.getPixelData();
 
   for (var i = 0; i < pixelData1.length; i += 4) {

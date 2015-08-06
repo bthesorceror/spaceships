@@ -56,13 +56,7 @@ Ship.prototype.height = function() {
   return 70;
 }
 
-var collision = require('./collision');
-Ship.prototype.collidesWithRock = function(rock) {
-  return collision(this, rock, { skipFlame: true });
-}
-
-Ship.prototype.draw = function(screen, options) {
-  options = options || {};
+Ship.prototype.drawShip = function(screen) {
   var self = this;
 
   screen.draw(function(context) {
@@ -79,28 +73,41 @@ Ship.prototype.draw = function(screen, options) {
     context.closePath();
     context.fill();
   });
+}
 
-  // Draw flame
-  if (self.powered && !options.skipFlame) {
-    screen.draw(function(context) {
-      var pos = this.getTranslatedPosition(self.position);
+Ship.prototype.drawFlame = function(screen) {
+  var self = this;
 
-      context.fillStyle = '#FF8C00';
-      context.translate(pos.x, pos.y);
+  screen.draw(function(context) {
+    var pos = this.getTranslatedPosition(self.position);
 
-      context.rotate(self.rotation * (Math.PI / 180));
+    context.fillStyle = '#FF8C00';
+    context.translate(pos.x, pos.y);
 
-      context.beginPath();
-      context.moveTo(0, 10);
-      context.lineTo(10, 15);
-      context.lineTo(10, 30);
-      context.lineTo(0, 25);
-      context.lineTo(-10, 30);
-      context.lineTo(-10, 15);
-      context.closePath();
+    context.rotate(self.rotation * (Math.PI / 180));
 
-      context.fill();
-    });
+    context.beginPath();
+    context.moveTo(0, 10);
+    context.lineTo(10, 15);
+    context.lineTo(10, 30);
+    context.lineTo(0, 25);
+    context.lineTo(-10, 30);
+    context.lineTo(-10, 15);
+    context.closePath();
+
+    context.fill();
+  });
+}
+
+Ship.prototype.drawCollision = function(screen) {
+  this.drawShip(screen);
+}
+
+Ship.prototype.draw = function(screen) {
+  this.drawShip(screen);
+
+  if (this.powered) {
+    this.drawFlame(screen);
   }
 }
 
