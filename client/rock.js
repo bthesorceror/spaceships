@@ -1,3 +1,6 @@
+var boundingBox = require('./bounding_box');
+var intersects = require('./intersects');
+
 module.exports = Rock;
 
 function Rock() {
@@ -24,8 +27,14 @@ Rock.prototype.height = function() {
   return this.size * 3;
 }
 
+Rock.prototype.boundingBox = function() {
+  return boundingBox(this);
+}
+
 Rock.prototype.draw = function(screen) {
   var self = this;
+
+  if (!intersects(this, screen)) return;
 
   screen.draw(function(context) {
     var pos = this.getTranslatedPosition(self.position);

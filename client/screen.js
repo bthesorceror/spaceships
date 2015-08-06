@@ -58,6 +58,19 @@ Screen.prototype.getCenteredOn = function() {
   return this.centeredOn;
 }
 
+Screen.prototype.boundingBox = function() {
+  var minX = this.centeredOn.x - (this.getWidth() / 2);
+  var minY = this.centeredOn.y - (this.getHeight() / 2);
+
+  var maxX = this.centeredOn.x + (this.getWidth() / 2);
+  var maxY = this.centeredOn.y + (this.getHeight() / 2);
+
+  return {
+    topLeft: {x: minX, y: minY},
+    bottomRight: {x: maxX, y: maxY}
+  }
+}
+
 Screen.prototype.getTranslatedPosition = function(original) {
   var center = this.getCenter();
 

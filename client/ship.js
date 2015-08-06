@@ -1,6 +1,7 @@
 var keys         = require('arcade_keys').keys;
 var EventEmitter = require('events').EventEmitter;
 var inherits     = require('util').inherits;
+var boundingBox  = require('./bounding_box');
 
 module.exports = Ship;
 
@@ -17,6 +18,10 @@ function Ship(ak) {
 Ship.prototype.setPosition = function(x, y) {
   this.position.x = x;
   this.position.y = y;
+}
+
+Ship.prototype.boundingBox = function() {
+  return boundingBox(this);
 }
 
 Ship.prototype.width = function() {
