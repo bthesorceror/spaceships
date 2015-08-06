@@ -9,7 +9,7 @@ function activePixel(data, start) {
     data[start+2];
 }
 
-function collision(obj1, obj2) {
+function collision(obj1, obj2, obj1Options) {
   if (!intersects(obj1, obj2)) return false;
 
   var canvas = document.createElement('canvas');
@@ -18,7 +18,7 @@ function collision(obj1, obj2) {
   screen.setCenteredOn(obj1.position.x, obj1.position.y);
   screen.setDimensions(obj1.width(), obj1.height());
 
-  obj1.draw(screen);
+  obj1.draw(screen, obj1Options);
   var pixelData1 = screen.getPixelData();
 
   screen.clear();
