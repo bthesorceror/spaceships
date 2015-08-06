@@ -9,6 +9,7 @@ function Rock() {
   this.rotation = 0;
   this.rotationSpeed = 0;
   this.size = 10;
+  this.vector = { x: 0, y: 0 };
 }
 
 Rock.prototype.setAttributesFromData = function(data) {
@@ -17,6 +18,7 @@ Rock.prototype.setAttributesFromData = function(data) {
   this.rotation      = data.rotation;
   this.rotationSpeed = data.rotationSpeed;
   this.size          = data.size;
+  this.vector        = data.vector;
 }
 
 Rock.prototype.width = function() {
@@ -59,6 +61,16 @@ Rock.prototype.draw = function(screen) {
   });
 }
 
-Rock.prototype.update = function() {
+Rock.prototype.move = function() {
+  this.position.x += this.vector.x;
+  this.position.y += this.vector.y;
+}
+
+Rock.prototype.rotate = function() {
   this.rotation = (this.rotation + this.rotationSpeed) % 360;
+}
+
+Rock.prototype.update = function() {
+  this.rotate();
+  this.move();
 }

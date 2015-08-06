@@ -5,7 +5,8 @@ module.exports = [
     color: '#F00',
     rotation: 0,
     rotationSpeed: 2,
-    size: 10
+    size: 10,
+    vector: { x: 1, y: 1 }
   },
   {
     x: 100,
@@ -13,7 +14,8 @@ module.exports = [
     color: '#FF0',
     rotation: 40,
     rotationSpeed: 3,
-    size: 20
+    size: 20,
+    vector: { x: -1, y: -1 }
   },
   {
     x: 400,
@@ -21,6 +23,7 @@ module.exports = [
     color: '#F0F',
     rotation: 0,
     rotationSpeed: 1,
-    size: 30
+    size: 30,
+    vector: { x: 0, y: -1 }
   }
 ];
