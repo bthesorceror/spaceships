@@ -39,8 +39,33 @@ domready(function() {
   var ship = new Ship(ak);
   ship.setPosition(200, 200);
 
+  var MAXWIDTH  = 10000;
+  var MAXHEIGHT = 10000;
+
+  function focusOnShip() {
+    var x = ship.position.x;
+    var y = ship.position.y;
+
+    var halfWidth  = screen.getWidth() / 2;
+    var halfHeight = screen.getHeight() / 2;
+
+    if (x < halfWidth) {
+      x = halfWidth;
+    } else if (x > MAXWIDTH - halfWidth) {
+      x = MAXWIDTH - halfWidth;
+    }
+
+    if (y < halfHeight) {
+      y = halfHeight;
+    } else if (y > MAXHEIGHT - halfHeight) {
+      y = MAXHEIGHT - halfHeight;
+    }
+
+    screen.setCenteredOn(x, y);
+  }
+
   ship.on('positionChanged', function(position) {
-    screen.setCenteredOn(position.x, position.y);
+    focusOnShip();
   });
 
   setupToggle();
@@ -75,7 +100,12 @@ domready(function() {
     draw();
   }
 
-  window.addEventListener('resize', setDimensions);
+  function onResize() {
+    setDimensions();
+    focusOnShip();
+  }
+
+  window.addEventListener('resize', onResize);
 
   setDimensions();
   loop();
