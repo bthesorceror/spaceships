@@ -4,6 +4,7 @@ var FullscreenToggle = require('./fullscreen_toggle');
 var Screen           = require('./screen');
 var Ship             = require('./ship');
 var Rock             = require('./rock');
+var MiniMap          = require('./mini_map');
 var collision        = require('./collision');
 
 function setupToggle() {
@@ -65,70 +66,10 @@ domready(function() {
     screen.setCenteredOn(x, y);
   }
 
-  var miniMapCanvas = document.querySelector('#miniMap');
-  var miniMapContext = miniMapCanvas.getContext('2d');
+  var miniMap = new MiniMap(
+    document.querySelector('#miniMap'), MAXWIDTH, MAXHEIGHT);
 
-  function setMiniMapSize() {
-    var percent = .25;
-    miniMapCanvas.width = screen.getWidth() * percent;
-    miniMapCanvas.height = screen.getWidth() * percent;
-  }
-  setMiniMapSize();
-
-  function clearMiniMap() {
-    miniMapContext.clearRect(0, 0,
-      miniMapCanvas.width, miniMapCanvas.height);
-
-    miniMapContext.save();
-    miniMapContext.fillStyle="rgba(0,0,0,0.9)";
-    miniMapContext.fillRect(0, 0,
-      miniMapCanvas.width, miniMapCanvas.height);
-    miniMapContext.restore();
-  }
-
-  function drawScreenOnMiniMap(screen) {
-    var adjustmentX = (miniMapCanvas.width / MAXWIDTH);
-    var adjustmentY = (miniMapCanvas.height / MAXHEIGHT);
-
-    var x = adjustmentX * screen.centeredOn.x;
-    var y = adjustmentY * screen.centeredOn.y;
-
-    var width = adjustmentX * screen.getWidth() / 2;
-    var height = adjustmentX * screen.getHeight() / 2;
-
-    miniMapContext.save();
-    miniMapContext.strokeStyle = '#00F';
-    miniMapContext.translate(x, y);
-
-    miniMapContext.beginPath();
-    miniMapContext.moveTo(-width,-height);
-    miniMapContext.lineTo(width, -height);
-    miniMapContext.lineTo(width, height);
-    miniMapContext.lineTo(-width, height);
-    miniMapContext.closePath();
-
-    miniMapContext.stroke();
-    miniMapContext.restore();
-  }
-
-  function drawOnMiniMap(obj, color) {
-    var x = (miniMapCanvas.width / MAXWIDTH) * obj.position.x;
-    var y = (miniMapCanvas.height / MAXHEIGHT) * obj.position.y;
-
-    miniMapContext.save();
-    miniMapContext.fillStyle = color;
-    miniMapContext.translate(x, y);
-
-    miniMapContext.beginPath();
-    miniMapContext.moveTo(-1,-1);
-    miniMapContext.lineTo(1, -1);
-    miniMapContext.lineTo(1, 1);
-    miniMapContext.lineTo(-1, 1);
-    miniMapContext.closePath();
-
-    miniMapContext.fill();
-    miniMapContext.restore();
-  }
+  miniMap.setCanvasSize(screen);
 
   ship.on('positionChanged', function(position) {
     focusOnShip();
@@ -137,12 +78,12 @@ domready(function() {
   setupToggle();
 
   function draw() {
-    drawScreenOnMiniMap(screen);
-    drawOnMiniMap(ship, '#0F0');
+    miniMap.drawScreenOutline(screen);
+    miniMap.drawObject(ship, '#0F0');
     ship.draw(screen);
     rocks.forEach(function(r) {
       r.draw(screen);
-      drawOnMiniMap(r, r.color);
+      miniMap.drawObject(r, r.color);
     });
   }
 
@@ -153,7 +94,7 @@ domready(function() {
 
   function setDimensions() {
     screen.setDimensions(window.innerWidth, window.innerHeight);
-    setMiniMapSize();
+    miniMap.setCanvasSize(screen);
   }
 
   function checkCollisions() {
@@ -167,7 +108,7 @@ domready(function() {
   function loop() {
     window.requestAnimationFrame(loop)
     screen.clear();
-    clearMiniMap();
+    miniMap.clear();
     update();
     checkCollisions();
     draw();
