@@ -1,9 +1,38 @@
 module.exports = Screen;
 
-function Screen(canvas) {
+function Screen(canvas, maxWidth, maxHeight) {
   this.canvas     = canvas;
   this.context    = canvas.getContext('2d');
   this.centeredOn = { x: 0, y: 0 };
+  this.maxWidth   = maxWidth;
+  this.maxHeight  = maxHeight;
+}
+
+Screen.prototype.halfWidth = function() {
+  return this.getWidth() / 2;
+}
+
+Screen.prototype.halfHeight = function() {
+  return this.getHeight() / 2;
+}
+
+Screen.prototype.focusOn = function(obj) {
+  var x = obj.position.x;
+  var y = obj.position.y;
+
+  if (x < this.halfWidth()) {
+    x = this.halfWidth();
+  } else if (x > this.maxWidth - this.halfWidth()) {
+    x = this.maxWidth - this.halfWidth();
+  }
+
+  if (y < this.halfHeight()) {
+    y = this.halfHeight();
+  } else if (y > this.maxHeight - this.halfHeight()) {
+    y = this.maxHeight - this.halfHeight();
+  }
+
+  this.setCenteredOn(x, y);
 }
 
 Screen.prototype.clear = function() {

@@ -44,36 +44,10 @@ domready(function() {
   var MAXWIDTH  = 10000;
   var MAXHEIGHT = 10000;
 
-  function focusOnShip() {
-    var x = ship.position.x;
-    var y = ship.position.y;
-
-    var halfWidth  = screen.getWidth() / 2;
-    var halfHeight = screen.getHeight() / 2;
-
-    if (x < halfWidth) {
-      x = halfWidth;
-    } else if (x > MAXWIDTH - halfWidth) {
-      x = MAXWIDTH - halfWidth;
-    }
-
-    if (y < halfHeight) {
-      y = halfHeight;
-    } else if (y > MAXHEIGHT - halfHeight) {
-      y = MAXHEIGHT - halfHeight;
-    }
-
-    screen.setCenteredOn(x, y);
-  }
-
   var miniMap = new MiniMap(
     document.querySelector('#miniMap'), MAXWIDTH, MAXHEIGHT);
 
   miniMap.setCanvasSize(screen);
-
-  ship.on('positionChanged', function(position) {
-    focusOnShip();
-  });
 
   setupToggle();
 
@@ -90,6 +64,7 @@ domready(function() {
   function update() {
     ship.update();
     rocks.forEach(function(r) { r.update() });
+    screen.focusOn(ship);
   }
 
   function setDimensions() {
@@ -116,7 +91,6 @@ domready(function() {
 
   function onResize() {
     setDimensions();
-    focusOnShip();
   }
 
   window.addEventListener('resize', onResize);
