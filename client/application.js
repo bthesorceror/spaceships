@@ -6,6 +6,7 @@ var Ship             = require('./ship');
 var Rock             = require('./rock');
 var MiniMap          = require('./mini_map');
 var collision        = require('./collision');
+var Gameloop         = require('migl-gameloop');
 
 function setupToggle() {
   var button = document.querySelector('#fullscreenToggle');
@@ -31,18 +32,19 @@ var rocks = require('./data/rocks').map(function(data) {
 });
 
 domready(function() {
-  var canvas   = document.querySelector('#gameScreen');
-  var keys     = arcadeKeys.keys;
-  var ak       = arcadeKeys([keys.left, keys.right, keys.down, keys.up]);
+  var loop   = new Gameloop();
+  var canvas = document.querySelector('#gameScreen');
+  var keys   = arcadeKeys.keys;
+  var ak     = arcadeKeys([keys.left, keys.right, keys.down, keys.up]);
 
-  var screen = new Screen(canvas);
+  var MAXWIDTH  = 10000;
+  var MAXHEIGHT = 10000;
+
+  var screen = new Screen(canvas, MAXWIDTH, MAXHEIGHT);
   screen.setCenteredOn(200, 200);
 
   var ship = new Ship(ak);
   ship.setPosition(200, 200);
-
-  var MAXWIDTH  = 10000;
-  var MAXHEIGHT = 10000;
 
   var miniMap = new MiniMap(
     document.querySelector('#miniMap'), MAXWIDTH, MAXHEIGHT);
@@ -80,14 +82,24 @@ domready(function() {
     });
   }
 
-  function loop() {
-    window.requestAnimationFrame(loop)
+  var step         = 1.0/60.0;
+  var currentDelta = 0;
+  loop.update = function(delta) {
+    currentDelta += (delta / 1000.0);
+    while(currentDelta > step) {
+      currentDelta -= step;
+      update();
+      checkCollisions();
+    }
+  };
+
+  loop.render = function(delta) {
     screen.clear();
     miniMap.clear();
-    update();
-    checkCollisions();
     draw();
-  }
+  };
+
+  loop.start();
 
   function onResize() {
     setDimensions();
@@ -96,5 +108,4 @@ domready(function() {
   window.addEventListener('resize', onResize);
 
   setDimensions();
-  loop();
 });
