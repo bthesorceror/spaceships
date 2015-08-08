@@ -1,6 +1,10 @@
 var boundingBox = require('./bounding_box');
 var intersects = require('./intersects');
 
+var degreesToVector  = require('./degrees_to_vector');
+var vectorToDegrees  = require('./vector_to_degrees');
+var vectorToDistance = require('./vector_to_distance');
+
 module.exports = Rock;
 
 function Rock() {
@@ -19,6 +23,33 @@ Rock.prototype.setAttributesFromData = function(data) {
   this.rotationSpeed = data.rotationSpeed;
   this.size          = data.size;
   this.vector        = data.vector;
+}
+
+
+Rock.prototype.fromImpact = function() {
+  if (this.size <= 10) return [];
+
+  var rock1 = new Rock();
+  var rock2 = new Rock();
+
+  var degrees  = vectorToDegrees(this.vector);
+  var distance = vectorToDistance(this.vector);
+
+  var vector1 = degreesToVector(degrees + 52, distance);
+  var vector2 = degreesToVector(degrees - 52, distance);
+
+  rock1.position = { x: this.position.x + (vector1.x * this.size / 2), y: this.position.y + (vector1.y * this.size / 2)};
+  rock2.position = { x: this.position.x + (vector2.x * this.size / 2), y: this.position.y + (vector2.y * this.size / 2)};
+
+  rock2.color         = rock1.color         = this.color;
+  rock2.rotation      = rock1.rotation      = this.rotation;
+  rock2.rotationSpeed = rock1.rotationSpeed = this.rotationSpeed;
+  rock2.size          = rock1.size          = this.size / 2;
+
+  rock1.vector = vector1;
+  rock2.vector = vector2;
+
+  return [rock1, rock2];
 }
 
 Rock.prototype.width = function() {

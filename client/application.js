@@ -82,6 +82,7 @@ domready(function() {
 
   function checkCollisions() {
     var removals = [];
+    var additions = [];
 
     rocks.forEach(function(rock) {
       for (var i = 0; i < ship.bullets.length; i++) {
@@ -89,6 +90,7 @@ domready(function() {
 
         if (collision(bullet, rock)) {
           removals.push(rock);
+          additions = additions.concat.apply(additions, rock.fromImpact());
           ship.markBulletForRemoval(bullet);
           return;
         }
@@ -100,6 +102,8 @@ domready(function() {
     rocks = rocks.filter(function(rock) {
       return removals.indexOf(rock) < 0;
     });
+
+    rocks = rocks.concat.apply(rocks, additions);
   }
 
   var step         = 1.0/60.0;
