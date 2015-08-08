@@ -35,7 +35,13 @@ domready(function() {
   var loop   = new Gameloop();
   var canvas = document.querySelector('#gameScreen');
   var keys   = arcadeKeys.keys;
-  var ak     = arcadeKeys([keys.left, keys.right, keys.down, keys.up]);
+  var ak     = arcadeKeys([
+    keys.left,
+    keys.right,
+    keys.down,
+    keys.up,
+    keys.space
+  ]);
 
   var MAXWIDTH  = 10000;
   var MAXHEIGHT = 10000;
@@ -75,10 +81,24 @@ domready(function() {
   }
 
   function checkCollisions() {
+    var removals = [];
+
     rocks.forEach(function(rock) {
-      if (collision(ship, rock)) {
-        console.dir('Collision detected');
+      for (var i = 0; i < ship.bullets.length; i++) {
+        var bullet = ship.bullets[i];
+
+        if (collision(bullet, rock)) {
+          removals.push(rock);
+          ship.markBulletForRemoval(bullet);
+          return;
+        }
       }
+    });
+
+    ship.purgeBullets();
+
+    rocks = rocks.filter(function(rock) {
+      return removals.indexOf(rock) < 0;
     });
   }
 

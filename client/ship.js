@@ -2,9 +2,19 @@ var keys         = require('arcade_keys').keys;
 var EventEmitter = require('events').EventEmitter;
 var inherits     = require('util').inherits;
 var boundingBox  = require('./bounding_box');
+var intersects    = require('./intersects');
 
 function convertToRadians(degrees) {
-  return degrees * (Math.PI / 180);
+  return (degrees - 90) * (Math.PI / 180);
+}
+
+function degreesToVector(degrees, multiplier) {
+  var radians = convertToRadians(degrees);
+  return radiansToVector(radians, multiplier);
+}
+
+function vectorToDistance(vector) {
+  return Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2));
 }
 
 function radiansToVector(radians, multiplier) {
@@ -20,6 +30,55 @@ module.exports = Ship;
 
 inherits(Ship, EventEmitter);
 
+function Bullet(x, y, vector, rotation) {
+  this.position = { x: x, y: y };
+  this.vector   = vector;
+  this.rotation = rotation;
+  this.distance = 0;
+}
+
+Bullet.prototype.width = function() { return 10; }
+Bullet.prototype.height = function() { return 10; }
+
+Bullet.prototype.boundingBox = function() {
+  return boundingBox(this);
+}
+
+Bullet.prototype.drawCollision = function(screen) {
+  this.draw(screen);
+}
+
+Bullet.prototype.draw = function(screen) {
+  if (!intersects(this, screen)) return;
+
+  var self = this;
+
+  screen.draw(function(context) {
+    var pos = this.getTranslatedPosition(self.position);
+
+    context.fillStyle = '#F0F';
+    context.translate(pos.x, pos.y);
+    context.rotate(self.rotation * (Math.PI / 180));
+
+    context.beginPath();
+
+    context.moveTo(-2, -5);
+    context.lineTo(2, -5);
+    context.lineTo(2, 5);
+    context.lineTo(-2, 5);
+
+    context.closePath();
+
+    context.fill();
+  });
+}
+
+Bullet.prototype.update = function() {
+  this.distance += vectorToDistance(this.vector);
+  this.position.x += this.vector.x;
+  this.position.y += this.vector.y;
+}
+
 function Ship(ak) {
   EventEmitter.call(this);
   this.ak            = ak;
@@ -27,6 +86,23 @@ function Ship(ak) {
   this.rotation      = 0;
   this.rotationSpeed = 3;
   this.vector = { x: 0, y: 0 };
+  this.bullets = [];
+
+  this.fireFrames = 0;
+  this.fireFrameLimit = 30;
+
+  this.maxBullets = 25;
+  this.maxBulletDistance = 1000;
+}
+
+Ship.prototype.markBulletForRemoval = function(bullet) {
+  bullet.destroy = true;
+}
+
+Ship.prototype.purgeBullets = function() {
+  this.bullets = this.bullets.filter(function(bullet) {
+    return !bullet.destroy;
+  });
 }
 
 Ship.prototype.setPosition = function(x, y) {
@@ -40,8 +116,7 @@ Ship.prototype.applyVector = function(vector) {
 }
 
 Ship.prototype.movementVector = function() {
-  var radians = convertToRadians(this.rotation - 90);
-  return radiansToVector(radians, 0.10);
+  return degreesToVector(this.rotation, 0.10);
 }
 
 Ship.prototype.boundingBox = function() {
@@ -109,6 +184,10 @@ Ship.prototype.draw = function(screen) {
   if (this.powered) {
     this.drawFlame(screen);
   }
+
+  this.bullets.forEach(function(bullet) {
+    bullet.draw(screen);
+  });
 }
 
 Ship.prototype.positionWasUpdated = function() {
@@ -135,9 +214,53 @@ Ship.prototype.updateMovement = function() {
   }
 }
 
+Ship.prototype.canFire = function() {
+  return this.bullets.length < this.maxBullets &&
+    this.fireFrames > this.fireFrameLimit;
+}
+
+Ship.prototype.fire = function() {
+  if (this.canFire()) {
+    this.fireFrames = 0;
+    var vector = degreesToVector(this.rotation, 7.5);
+
+    var position = { x: this.position.x, y: this.position.y };
+    position.x += vector.x;
+    position.y += vector.y;
+
+    vector.x += this.vector.x;
+    vector.y += this.vector.y;
+
+    this.bullets.push(
+      new Bullet(
+        position.x,
+        position.y,
+        vector,
+        this.rotation)
+    );
+  }
+}
+
+Ship.prototype.updateFiring = function() {
+  this.fireFrames += 1;
+  if (this.ak.isPressed(keys.space)) {
+    this.fire();
+  }
+}
+
 Ship.prototype.update = function() {
   this.updateRotation();
   this.updateMovement();
+  this.updateFiring();
+
+  this.bullets.forEach(function(bullet) {
+    bullet.update();
+  });
+
+  var self = this;
+  this.bullets = this.bullets.filter(function(bullet) {
+    return bullet.distance < self.maxBulletDistance;
+  });
 
   this.move();
 }
