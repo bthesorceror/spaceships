@@ -26,7 +26,7 @@ Rock.prototype.setAttributesFromData = function(data) {
 }
 
 
-Rock.prototype.fromImpact = function() {
+Rock.prototype.fromBulletImpact = function() {
   if (this.size <= 10) return [];
 
   var rock1 = new Rock();
@@ -38,8 +38,15 @@ Rock.prototype.fromImpact = function() {
   var vector1 = degreesToVector(degrees + 52, distance);
   var vector2 = degreesToVector(degrees - 52, distance);
 
-  rock1.position = { x: this.position.x + (vector1.x * this.size / 2), y: this.position.y + (vector1.y * this.size / 2)};
-  rock2.position = { x: this.position.x + (vector2.x * this.size / 2), y: this.position.y + (vector2.y * this.size / 2)};
+  rock1.position = {
+    x: this.position.x + (vector1.x * this.size / 2),
+    y: this.position.y + (vector1.y * this.size / 2)
+  };
+
+  rock2.position = {
+    x: this.position.x + (vector2.x * this.size / 2),
+    y: this.position.y + (vector2.y * this.size / 2)
+  };
 
   rock2.color         = rock1.color         = this.color;
   rock2.rotation      = rock1.rotation      = this.rotation;

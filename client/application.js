@@ -90,7 +90,7 @@ domready(function() {
 
         if (collision(bullet, rock)) {
           removals.push(rock);
-          additions = additions.concat.apply(additions, rock.fromImpact());
+          additions = additions.concat.apply(additions, rock.fromBulletImpact());
           ship.markBulletForRemoval(bullet);
           return;
         }
