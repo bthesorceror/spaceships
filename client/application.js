@@ -8,6 +8,9 @@ var MiniMap          = require('./mini_map');
 var collision        = require('./collision');
 var Gameloop         = require('migl-gameloop');
 
+var MAXWIDTH  = 10000;
+var MAXHEIGHT = 10000;
+
 function setupToggle() {
   var button = document.querySelector('#fullscreenToggle');
   var toggle = new FullscreenToggle();
@@ -25,11 +28,7 @@ function setupToggle() {
   button.addEventListener('mouseup', toggle.toggle.bind(toggle));
 }
 
-var rocks = require('./data/rocks').map(function(data) {
-  var rock = new Rock();
-  rock.setAttributesFromData(data);
-  return rock;
-});
+var rocks = require('./data/rocks')(250, MAXWIDTH, MAXHEIGHT);
 
 domready(function() {
   var loop   = new Gameloop();
@@ -42,9 +41,6 @@ domready(function() {
     keys.up,
     keys.space
   ]);
-
-  var MAXWIDTH  = 10000;
-  var MAXHEIGHT = 10000;
 
   var screen = new Screen(canvas, MAXWIDTH, MAXHEIGHT);
   screen.setCenteredOn(200, 200);
@@ -65,7 +61,7 @@ domready(function() {
     ship.draw(screen);
     rocks.forEach(function(r) {
       r.draw(screen);
-      miniMap.drawObject(r, r.color);
+      miniMap.drawObject(r, '#F3F');
     });
   }
 
