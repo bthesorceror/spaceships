@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "mkdir -p public/js && browserify client/application.js -o public/js/application.js",
-    "watch": "mkdir -p public/js && watchify client/application.js -o public/js/application.js"
+    "watch": "mkdir -p public/js && watchify client/application.js -o public/js/application.js",
+    "start": "node index.js",
+    "postinstall": "npm run build"
   },
   "author": "",
   "license": "ISC",
