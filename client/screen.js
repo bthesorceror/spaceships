@@ -1,11 +1,11 @@
 module.exports = Screen;
 
-function Screen(canvas, maxWidth, maxHeight) {
+function Screen(canvas, map) {
   this.canvas     = canvas;
   this.context    = canvas.getContext('2d');
   this.centeredOn = { x: 0, y: 0 };
-  this.maxWidth   = maxWidth;
-  this.maxHeight  = maxHeight;
+  this.maxWidth   = !!map ? map.width() : 0;
+  this.maxHeight  = !!map ? map.height() : 0;
 }
 
 Screen.prototype.halfWidth = function() {

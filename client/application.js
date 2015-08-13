@@ -7,6 +7,8 @@ var Rock             = require('./rock');
 var MiniMap          = require('./mini_map');
 var collision        = require('./collision');
 var Gameloop         = require('migl-gameloop');
+var Map              = require('./map');
+var intersects       = require('./intersects');
 
 var MAXWIDTH  = 10000;
 var MAXHEIGHT = 10000;
@@ -42,14 +44,15 @@ domready(function() {
     keys.space
   ]);
 
-  var screen = new Screen(canvas, MAXWIDTH, MAXHEIGHT);
+  var map = new Map(MAXWIDTH, MAXHEIGHT);
+
+  var screen = new Screen(canvas, map);
   screen.setCenteredOn(200, 200);
 
   var ship = new Ship(ak);
   ship.setPosition(200, 200);
 
-  var miniMap = new MiniMap(
-    document.querySelector('#miniMap'), MAXWIDTH, MAXHEIGHT);
+  var miniMap = new MiniMap(document.querySelector('#miniMap'), map);
 
   miniMap.setCanvasSize(screen);
 
@@ -91,6 +94,10 @@ domready(function() {
           return;
         }
       }
+
+      if (!intersects(rock, map)) {
+        removals.push(rock);
+      }
     });
 
     ship.purgeBullets();
@@ -100,6 +107,7 @@ domready(function() {
     });
 
     rocks = rocks.concat.apply(rocks, additions);
+    console.dir(rocks.length);
   }
 
   var step         = 1.0/60.0;

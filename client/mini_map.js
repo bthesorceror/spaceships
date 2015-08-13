@@ -1,11 +1,11 @@
 module.exports = MiniMap;
 
-function MiniMap(canvas, maxWidth, maxHeight) {
+function MiniMap(canvas, map) {
   this.canvas = canvas;
   this.context = canvas.getContext('2d');
   this.percent = .25;
-  this.maxWidth = maxWidth;
-  this.maxHeight = maxHeight;
+  this.maxWidth = map.width();
+  this.maxHeight = map.height();
 }
 
 MiniMap.prototype.setCanvasSize = function(screen) {
@@ -67,4 +67,3 @@ MiniMap.prototype.drawObject = function(obj, color) {
   this.context.fill();
   this.context.restore();
 }
-

@@ -10,7 +10,6 @@ module.exports = Ship;
 
 inherits(Ship, EventEmitter);
 
-
 function Ship(ak) {
   EventEmitter.call(this);
   this.ak            = ak;
