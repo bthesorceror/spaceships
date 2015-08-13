@@ -18,12 +18,22 @@ function Ship(ak) {
   this.rotationSpeed = 3;
   this.vector = { x: 0, y: 0 };
   this.bullets = [];
+  this.state = 'active';
 
   this.fireFrames = 0;
   this.fireFrameLimit = 30;
 
   this.maxBullets = 25;
   this.maxBulletDistance = 1000;
+}
+
+Ship.prototype.isActive = function() {
+  return this.state === 'active';
+}
+
+Ship.prototype.markAsDestroyed = function() {
+  this.state = 'exploding';
+  this.explodingFrameCount = 0;
 }
 
 Ship.prototype.markBulletForRemoval = function(bullet) {
@@ -106,10 +116,32 @@ Ship.prototype.drawFlame = function(screen) {
 }
 
 Ship.prototype.drawCollision = function(screen) {
-  this.drawShip(screen);
+  if (this.state === 'active')
+    this.drawShip(screen);
 }
 
-Ship.prototype.draw = function(screen) {
+Ship.prototype.drawExploding = function(screen) {
+  var self = this;
+  var lineWidth = 10;
+  var size = Math.floor(self.explodingFrameCount / 5)  * 2;
+
+  screen.draw(function(context) {
+    var pos = this.getTranslatedPosition(self.position);
+
+    context.strokeStyle = '#FFFF00';
+    context.lineWidth = lineWidth;
+    context.translate(pos.x, pos.y);
+    context.beginPath();
+    context.moveTo(-size, -size);
+    context.lineTo(size, -size);
+    context.lineTo(size, size);
+    context.lineTo(-size, size);
+    context.closePath();
+    context.stroke();
+  });
+}
+
+Ship.prototype.drawActive = function(screen) {
   this.drawShip(screen);
 
   if (this.powered) {
@@ -119,6 +151,13 @@ Ship.prototype.draw = function(screen) {
   this.bullets.forEach(function(bullet) {
     bullet.draw(screen);
   });
+}
+
+Ship.prototype.draw = function(screen) {
+  if (this.state === 'exploding')
+    return this.drawExploding(screen);
+  else if (this.state === 'active')
+    return this.drawActive(screen);
 }
 
 Ship.prototype.positionWasUpdated = function() {
@@ -179,7 +218,7 @@ Ship.prototype.updateFiring = function() {
   }
 }
 
-Ship.prototype.update = function() {
+Ship.prototype.updateActive = function() {
   this.updateRotation();
   this.updateMovement();
   this.updateFiring();
@@ -194,6 +233,20 @@ Ship.prototype.update = function() {
   });
 
   this.move();
+}
+
+Ship.prototype.updateExploding = function() {
+  if (this.explodingFrameCount < 50)
+    this.explodingFrameCount++;
+  else
+    this.state = 'exploded';
+}
+
+Ship.prototype.update = function() {
+  if (this.state === 'exploding')
+    this.updateExploding();
+  else if (this.state === 'active')
+    this.updateActive();
 }
 
 Ship.prototype.move = function() {

@@ -61,11 +61,11 @@ domready(function() {
   function draw() {
     miniMap.drawScreenOutline(screen);
     miniMap.drawObject(ship, '#0F0');
-    ship.draw(screen);
     rocks.forEach(function(r) {
       r.draw(screen);
       miniMap.drawObject(r, '#F3F');
     });
+    ship.draw(screen);
   }
 
   function update() {
@@ -79,9 +79,19 @@ domready(function() {
     miniMap.setCanvasSize(screen);
   }
 
+  function shipOutOfBounds() {
+    var bbox = ship.boundingBox();
+    return bbox.topLeft.x < 0 || bbox.bottomRight.x > map.width() ||
+      bbox.topLeft.y < 0 || bbox.bottomRight.y > map.height();
+  }
+
   function checkCollisions() {
     var removals = [];
     var additions = [];
+
+    if (ship.isActive() && shipOutOfBounds()) {
+      ship.markAsDestroyed();
+    }
 
     rocks.forEach(function(rock) {
       for (var i = 0; i < ship.bullets.length; i++) {
@@ -97,6 +107,12 @@ domready(function() {
 
       if (!intersects(rock, map)) {
         removals.push(rock);
+        return;
+      }
+
+      if (collision(ship, rock)) {
+        ship.markAsDestroyed();
+        return;
       }
     });
 
@@ -107,7 +123,6 @@ domready(function() {
     });
 
     rocks = rocks.concat.apply(rocks, additions);
-    console.dir(rocks.length);
   }
 
   var step         = 1.0/60.0;
