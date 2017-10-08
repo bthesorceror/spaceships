@@ -10,15 +10,17 @@
     "start": "node index.js",
     "postinstall": "npm run build"
   },
-  "author": "",
+  "author": "Brandon Farmer <bthesorceror@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "arcade_keys": "bthesorceror/arcade_keys",
+    "arcade_keys": "^1.0.1",
     "browserify": "^11.0.0",
     "domready": "^1.0.8",
     "ecstatic": "^0.8.0",
     "migl-gameloop": "^1.1.0",
-    "stack": "^0.1.0",
-    "watchify": "^3.3.0"
+    "stack": "^0.1.0"
+  },
+  "devDependencies": {
+    "watchify": "^3.9.0"
   }
 }
