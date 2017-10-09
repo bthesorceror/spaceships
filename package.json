@@ -17,6 +17,7 @@
     "browserify": "^11.0.0",
     "domready": "^1.0.8",
     "ecstatic": "^0.8.0",
+    "lodash": "^4.17.4",
     "migl-gameloop": "^1.1.0",
     "stack": "^0.1.0"
   },

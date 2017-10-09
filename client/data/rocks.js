@@ -1,48 +1,28 @@
-var Rock = require('../rock');
+const _ = require('lodash')
+const Rock = require('../rock')
+const colors = ['#F00', '#FF0', '#F0F', '#CCC']
 
-function getRandomWithin(min, max) {
-  return Math.random() * (max - min) + min;
-}
-
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
-}
-
-function getRandomItem(array) {
-  return array[getRandomInt(array.length)];
-}
-
-function randomRockColor() {
-  var colors = ['#F00', '#FF0', '#F0F', '#CCC'];
-  return getRandomItem(colors);
-}
-
-function createRockData(maxWidth, maxHeight) {
-  var x = getRandomInt(maxWidth);
-  var y = getRandomInt(maxHeight);
-
-  var deltaX = getRandomWithin(-2, 2);
-  var deltaY = getRandomWithin(-2, 2);
-
+function createRockData (maxWidth, maxHeight) {
   return {
-    x: x,
-    y: y,
-    color: randomRockColor(),
+    x: _.random(0, maxWidth),
+    y: _.random(0, maxHeight),
+    color: _.sample(colors),
     rotation: 0,
     rotationSpeed: 2,
     size: 40,
-    vector: { x: deltaX, y: deltaY }
-  };
+    vector: {
+      x: _.random(-2, 2),
+      y: _.random(-2, 2)
+    }
+  }
 }
 
-module.exports = function(count, maxWidth, maxHeight) {
-  var rocks = [];
-  for (var i = 0; i < count; i++) {
-    var data = createRockData(maxWidth, maxHeight);
-    var rock = new Rock();
+module.exports = function (count, maxWidth, maxHeight) {
+  return _.times(count, function () {
+    return _.tap(new Rock(), function (rock) {
+      let data = createRockData(maxWidth, maxHeight)
 
-    rock.setAttributesFromData(data);
-    rocks.push(rock);
-  }
-  return rocks;
-};
+      rock.setAttributesFromData(data)
+    })
+  })
+}
