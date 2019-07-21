@@ -20,7 +20,7 @@ function createRockData (maxWidth, maxHeight) {
 module.exports = function (count, maxWidth, maxHeight) {
   return _.times(count, function () {
     return _.tap(new Rock(), function (rock) {
-      let data = createRockData(maxWidth, maxHeight)
+      const data = createRockData(maxWidth, maxHeight)
 
       rock.setAttributesFromData(data)
     })

@@ -3,7 +3,6 @@ var arcadeKeys = require('arcade_keys')
 var FullscreenToggle = require('./fullscreen_toggle')
 var Screen = require('./screen')
 var Ship = require('./ship')
-var Rock = require('./rock')
 var MiniMap = require('./mini_map')
 var collision = require('./collision')
 var Gameloop = require('migl-gameloop')
@@ -35,7 +34,6 @@ var rocks = require('./data/rocks')(250, MAXWIDTH, MAXHEIGHT)
 domready(function () {
   var loop = new Gameloop()
   var canvas = document.querySelector('#gameScreen')
-  var keys = arcadeKeys.keys
   var ak = arcadeKeys()
 
   var map = new Map(MAXWIDTH, MAXHEIGHT)
@@ -106,7 +104,6 @@ domready(function () {
 
       if (collision(ship, rock)) {
         ship.markAsDestroyed()
-        return
       }
     })
 

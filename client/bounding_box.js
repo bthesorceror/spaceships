@@ -6,7 +6,7 @@ module.exports = function (obj) {
   var maxY = obj.position.y + (obj.height() / 2)
 
   return {
-    topLeft: {x: minX, y: minY},
-    bottomRight: {x: maxX, y: maxY}
+    topLeft: { x: minX, y: minY },
+    bottomRight: { x: maxX, y: maxY }
   }
 }
