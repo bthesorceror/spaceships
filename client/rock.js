@@ -1,9 +1,7 @@
 var boundingBox = require('./bounding_box')
 var intersects = require('./intersects')
 
-var degreesToVector = require('./degrees_to_vector')
-var vectorToDegrees = require('./vector_to_degrees')
-var vectorToDistance = require('./vector_to_distance')
+const { degreesToVector, vectorToDegrees, vectorToDistance } = require('./utils')
 
 module.exports = Rock
 

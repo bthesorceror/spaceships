@@ -1,6 +1,7 @@
 var intersects = require('./intersects')
 var boundingBox = require('./bounding_box')
-var vectorToDistance = require('./vector_to_distance')
+
+const { vectorToDistance } = require('./utils')
 
 module.exports = Bullet
 

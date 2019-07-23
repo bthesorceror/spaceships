@@ -99,6 +99,7 @@ domready(function () {
 
       if (!intersects(rock, map)) {
         removals.push(rock)
+        // TODO: Replace Rock
         return
       }
 

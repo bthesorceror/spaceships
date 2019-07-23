@@ -1,9 +1,10 @@
-var keys = require('arcade_keys').keys
-var EventEmitter = require('events').EventEmitter
-var inherits = require('util').inherits
-var boundingBox = require('./bounding_box')
-var degreesToVector = require('./degrees_to_vector')
-var Bullet = require('./bullet')
+const boundingBox = require('./bounding_box')
+const Bullet = require('./bullet')
+
+const { EventEmitter } = require('events')
+const { inherits } = require('util')
+const { keys } = require('arcade_keys')
+const { degreesToVector } = require('./utils')
 
 module.exports = Ship
 
