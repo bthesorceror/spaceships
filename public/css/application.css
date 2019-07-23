@@ -5,6 +5,14 @@ body {
   overflow: hidden;
 }
 
+#scoreboard {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  font-size: 20pt;
+  color: yellow;
+}
+
 #fullscreenToggle {
   position: absolute;
   width: 32px;

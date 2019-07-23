@@ -9,6 +9,8 @@ var Gameloop = require('migl-gameloop')
 var Map = require('./map')
 var intersects = require('./intersects')
 
+const Scoreboard = require('./ui/scoreboard')
+
 var MAXWIDTH = 10000
 var MAXHEIGHT = 10000
 
@@ -32,9 +34,11 @@ function setupToggle () {
 var rocks = require('./data/rocks')(250, MAXWIDTH, MAXHEIGHT)
 
 domready(function () {
+  const scoreboard = new Scoreboard()
   var loop = new Gameloop()
   var canvas = document.querySelector('#gameScreen')
   var ak = arcadeKeys()
+  document.querySelector('body').appendChild(scoreboard.view)
 
   var map = new Map(MAXWIDTH, MAXHEIGHT)
 
@@ -93,6 +97,7 @@ domready(function () {
           removals.push(rock)
           additions = additions.concat.apply(additions, rock.fromBulletImpact())
           ship.markBulletForRemoval(bullet)
+          scoreboard.increment(5)
           return
         }
       }
