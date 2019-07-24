@@ -1,69 +1,77 @@
-module.exports = MiniMap
+module.exports = class MiniMap {
+  constructor (map) {
+    this.canvas = document.createElement('canvas')
+    this.context = this.canvas.getContext('2d')
 
-function MiniMap (canvas, map) {
-  this.canvas = canvas
-  this.context = canvas.getContext('2d')
-  this.percent = 0.25
-  this.maxWidth = map.width()
-  this.maxHeight = map.height()
-}
+    this.canvas.id = 'miniMap'
+    this.percent = 0.25
+    this.maxWidth = map.width()
+    this.maxHeight = map.height()
+  }
 
-MiniMap.prototype.setCanvasSize = function (screen) {
-  this.canvas.width = screen.getWidth() * this.percent
-  this.canvas.height = screen.getWidth() * this.percent
-}
+  get adjustmentX () {
+    return (this.canvas.width / this.maxWidth)
+  }
 
-MiniMap.prototype.clear = function () {
-  this.context.clearRect(0, 0,
-    this.canvas.width, this.canvas.height)
+  get adjustmentY () {
+    return (this.canvas.height / this.maxHeight)
+  }
 
-  this.context.save()
-  this.context.fillStyle = 'rgba(0,0,0,0.9)'
-  this.context.fillRect(0, 0,
-    this.canvas.width, this.canvas.height)
-  this.context.restore()
-}
+  setCanvasSize (screen) {
+    this.canvas.width = screen.getWidth() * this.percent
+    this.canvas.height = screen.getWidth() * this.percent
+  }
 
-MiniMap.prototype.drawScreenOutline = function (screen) {
-  var adjustmentX = (this.canvas.width / this.maxWidth)
-  var adjustmentY = (this.canvas.height / this.maxHeight)
+  clear () {
+    this.context.clearRect(0, 0,
+      this.canvas.width, this.canvas.height)
 
-  var x = adjustmentX * screen.centeredOn.x
-  var y = adjustmentY * screen.centeredOn.y
+    this.context.save()
+    this.context.fillStyle = 'rgba(0,0,0,0.8)'
+    this.context.fillRect(0, 0,
+      this.canvas.width, this.canvas.height)
+    this.context.restore()
+  }
 
-  var width = adjustmentX * screen.getWidth() / 2
-  var height = adjustmentX * screen.getHeight() / 2
+  drawScreenOutline (screen) {
+    var width = this.adjustmentX * screen.getWidth() / 2
+    var height = this.adjustmentY * screen.getHeight() / 2
 
-  this.context.save()
-  this.context.strokeStyle = '#00F'
-  this.context.translate(x, y)
+    this.context.save()
+    this.context.strokeStyle = '#00F'
+    this.translate(screen.centeredOn.x, screen.centeredOn.y)
 
-  this.context.beginPath()
-  this.context.moveTo(-width, -height)
-  this.context.lineTo(width, -height)
-  this.context.lineTo(width, height)
-  this.context.lineTo(-width, height)
-  this.context.closePath()
+    this.context.beginPath()
+    this.context.moveTo(-width, -height)
+    this.context.lineTo(width, -height)
+    this.context.lineTo(width, height)
+    this.context.lineTo(-width, height)
+    this.context.closePath()
 
-  this.context.stroke()
-  this.context.restore()
-}
+    this.context.stroke()
+    this.context.restore()
+  }
 
-MiniMap.prototype.drawObject = function (obj, color) {
-  var x = (this.canvas.width / this.maxWidth) * obj.position.x
-  var y = (this.canvas.height / this.maxHeight) * obj.position.y
+  drawObject (obj, color) {
+    this.context.save()
+    this.translate(obj.position.x, obj.position.y)
 
-  this.context.save()
-  this.context.fillStyle = color
-  this.context.translate(x, y)
+    this.context.fillStyle = color
+    this.context.beginPath()
+    this.context.moveTo(-1, -1)
+    this.context.lineTo(1, -1)
+    this.context.lineTo(1, 1)
+    this.context.lineTo(-1, 1)
+    this.context.closePath()
+    this.context.fill()
 
-  this.context.beginPath()
-  this.context.moveTo(-1, -1)
-  this.context.lineTo(1, -1)
-  this.context.lineTo(1, 1)
-  this.context.lineTo(-1, 1)
-  this.context.closePath()
+    this.context.restore()
+  }
 
-  this.context.fill()
-  this.context.restore()
+  translate (x, y) {
+    var newX = this.adjustmentX * x
+    var newY = this.adjustmentY * y
+
+    this.context.translate(newX, newY)
+  }
 }

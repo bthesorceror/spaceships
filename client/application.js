@@ -28,27 +28,29 @@ function setupToggle () {
     button.classList.remove('exitFullscreen')
   })
 
-  button.addEventListener('mouseup', toggle.toggle.bind(toggle))
+  button.addEventListener('mouseup', () => {
+    toggle.toggle()
+  })
 }
 
 var rocks = require('./data/rocks')(250, MAXWIDTH, MAXHEIGHT)
 
 domready(function () {
+  const map = new Map(MAXWIDTH, MAXHEIGHT)
   const scoreboard = new Scoreboard()
+  const miniMap = new MiniMap(map)
+
   var loop = new Gameloop()
   var canvas = document.querySelector('#gameScreen')
   var ak = arcadeKeys()
   document.querySelector('body').appendChild(scoreboard.view)
-
-  var map = new Map(MAXWIDTH, MAXHEIGHT)
+  document.querySelector('body').appendChild(miniMap.canvas)
 
   var screen = new Screen(canvas, map)
   screen.setCenteredOn(200, 200)
 
   var ship = new Ship(ak)
   ship.setPosition(200, 200)
-
-  var miniMap = new MiniMap(document.querySelector('#miniMap'), map)
 
   miniMap.setCanvasSize(screen)
 
