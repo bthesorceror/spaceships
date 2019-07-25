@@ -15,7 +15,7 @@ function collision (obj1, obj2, obj1Options) {
   var canvas = document.createElement('canvas')
   var screen = new Screen(canvas)
 
-  screen.setCenteredOn(obj1.position.x, obj1.position.y)
+  screen.centeredOn = { x: obj1.position.x, y: obj1.position.y }
   screen.setDimensions(obj1.width(), obj1.height())
 
   obj1.drawCollision(screen)

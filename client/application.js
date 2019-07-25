@@ -1,22 +1,22 @@
-var domready = require('domready')
-var arcadeKeys = require('arcade_keys')
-var FullscreenToggle = require('./fullscreen_toggle')
-var Screen = require('./screen')
-var Ship = require('./ship')
-var MiniMap = require('./mini_map')
-var collision = require('./collision')
-var Gameloop = require('migl-gameloop')
-var Map = require('./map')
-var intersects = require('./intersects')
+const domready = require('domready')
+const arcadeKeys = require('arcade_keys')
+const FullscreenToggle = require('./fullscreen_toggle')
+const Screen = require('./screen')
+const Ship = require('./ship')
+const MiniMap = require('./mini_map')
+const collision = require('./collision')
+const Gameloop = require('migl-gameloop')
+const Map = require('./map')
+const intersects = require('./intersects')
 
 const Scoreboard = require('./ui/scoreboard')
 
-var MAXWIDTH = 10000
-var MAXHEIGHT = 10000
+const MAXWIDTH = 10000
+const MAXHEIGHT = 10000
 
 function setupToggle () {
-  var button = document.querySelector('#fullscreenToggle')
-  var toggle = new FullscreenToggle()
+  const button = document.querySelector('#fullscreenToggle')
+  const toggle = new FullscreenToggle()
 
   toggle.on('on', function () {
     button.classList.add('exitFullscreen')
@@ -33,26 +33,26 @@ function setupToggle () {
   })
 }
 
-var rocks = require('./data/rocks')(250, MAXWIDTH, MAXHEIGHT)
+let rocks = require('./data/rocks')(250, MAXWIDTH, MAXHEIGHT)
 
 domready(function () {
   const map = new Map(MAXWIDTH, MAXHEIGHT)
-  const scoreboard = new Scoreboard()
-  const miniMap = new MiniMap(map)
 
-  var loop = new Gameloop()
-  var canvas = document.querySelector('#gameScreen')
-  var ak = arcadeKeys()
+  const scoreboard = new Scoreboard()
   document.querySelector('body').appendChild(scoreboard.view)
+
+  const loop = new Gameloop()
+  const canvas = document.querySelector('#gameScreen')
+  const ak = arcadeKeys()
+
+  const screen = new Screen(canvas, map)
+
+  const miniMap = new MiniMap(map, screen)
   document.querySelector('body').appendChild(miniMap.canvas)
 
-  var screen = new Screen(canvas, map)
-  screen.setCenteredOn(200, 200)
-
-  var ship = new Ship(ak)
+  const ship = new Ship(ak)
   ship.setPosition(200, 200)
-
-  miniMap.setCanvasSize(screen)
+  screen.focusOn(ship)
 
   setupToggle()
 
@@ -74,7 +74,6 @@ domready(function () {
 
   function setDimensions () {
     screen.setDimensions(window.innerWidth, window.innerHeight)
-    miniMap.setCanvasSize(screen)
   }
 
   function shipOutOfBounds () {

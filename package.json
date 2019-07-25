@@ -20,6 +20,7 @@
     "lodash": "^4.17.15",
     "migl-gameloop": "^1.1.0",
     "nanocomponent": "^6.5.2",
+    "nanohtml": "^1.6.3",
     "stack": "^0.1.0"
   },
   "devDependencies": {

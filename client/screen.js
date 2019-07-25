@@ -1,116 +1,103 @@
-module.exports = Screen
+const { EventEmitter } = require('events')
 
-function Screen (canvas, map) {
-  this.canvas = canvas
-  this.context = canvas.getContext('2d')
-  this.centeredOn = { x: 0, y: 0 }
-  this.maxWidth = map ? map.width() : 0
-  this.maxHeight = map ? map.height() : 0
-}
-
-Screen.prototype.halfWidth = function () {
-  return this.getWidth() / 2
-}
-
-Screen.prototype.halfHeight = function () {
-  return this.getHeight() / 2
-}
-
-Screen.prototype.focusOn = function (obj) {
-  var x = obj.position.x
-  var y = obj.position.y
-
-  if (x < this.halfWidth()) {
-    x = this.halfWidth()
-  } else if (x > this.maxWidth - this.halfWidth()) {
-    x = this.maxWidth - this.halfWidth()
+module.exports = class Screen extends EventEmitter {
+  constructor (canvas, map) {
+    super()
+    this.map = map
+    this.canvas = canvas
+    this.context = canvas.getContext('2d')
+    this.centeredOn = { x: 0, y: 0 }
   }
 
-  if (y < this.halfHeight()) {
-    y = this.halfHeight()
-  } else if (y > this.maxHeight - this.halfHeight()) {
-    y = this.maxHeight - this.halfHeight()
+  focusOn (obj) {
+    let { x, y } = obj.position
+
+    x = Math.min(Math.max(x, this.halfWidth), this.maxWidth - this.halfWidth)
+    y = Math.min(Math.max(y, this.halfHeight), this.maxHeight - this.halfHeight)
+
+    this.centeredOn = { x, y }
   }
 
-  this.setCenteredOn(x, y)
-}
-
-Screen.prototype.clear = function () {
-  this.context.clearRect(
-    0, 0, this.canvas.width, this.canvas.height)
-}
-
-Screen.prototype.getPixelData = function () {
-  return this.context.getImageData(
-    0, 0, this.getWidth(), this.getHeight()).data
-}
-
-Screen.prototype.setHeight = function (height) {
-  this.canvas.setAttribute('height', height)
-}
-
-Screen.prototype.getHeight = function () {
-  return this.canvas.height
-}
-
-Screen.prototype.setWidth = function (width) {
-  this.canvas.setAttribute('width', width)
-}
-
-Screen.prototype.getWidth = function () {
-  return this.canvas.width
-}
-
-Screen.prototype.setDimensions = function (width, height) {
-  this.setWidth(width)
-  this.setHeight(height)
-}
-
-Screen.prototype.getCenter = function () {
-  var centerX = this.canvas.width / 2
-  var centerY = this.canvas.height / 2
-
-  return { x: centerX, y: centerY }
-}
-
-Screen.prototype.setCenteredOn = function (x, y) {
-  this.centeredOn.x = x
-  this.centeredOn.y = y
-}
-
-Screen.prototype.changeCenteredOn = function (deltaX, deltaY) {
-  this.centeredOn.x += deltaX
-  this.centeredOn.y += deltaY
-}
-
-Screen.prototype.getCenteredOn = function () {
-  return this.centeredOn
-}
-
-Screen.prototype.boundingBox = function () {
-  var minX = this.centeredOn.x - (this.getWidth() / 2)
-  var minY = this.centeredOn.y - (this.getHeight() / 2)
-
-  var maxX = this.centeredOn.x + (this.getWidth() / 2)
-  var maxY = this.centeredOn.y + (this.getHeight() / 2)
-
-  return {
-    topLeft: { x: minX, y: minY },
-    bottomRight: { x: maxX, y: maxY }
+  clear () {
+    this.context.clearRect(0, 0, this.width, this.height)
   }
-}
 
-Screen.prototype.getTranslatedPosition = function (original) {
-  var center = this.getCenter()
+  draw (callback) {
+    this.context.save()
+    callback.call(this, this.context)
+    this.context.restore()
+  }
 
-  var x = center.x + (original.x - this.centeredOn.x)
-  var y = center.y + (original.y - this.centeredOn.y)
+  getPixelData () {
+    return this.context.getImageData(
+      0, 0,
+      this.width, this.height
+    ).data
+  }
 
-  return { x: x, y: y }
-}
+  get maxWidth () {
+    return this.map ? this.map.width() : 0
+  }
 
-Screen.prototype.draw = function (cb) {
-  this.context.save()
-  cb.call(this, this.context)
-  this.context.restore()
+  get maxHeight () {
+    return this.map ? this.map.height() : 0
+  }
+
+  get width () {
+    return this.canvas.width
+  }
+
+  get height () {
+    return this.canvas.height
+  }
+
+  set height (val) {
+    this.canvas.setAttribute('height', val)
+  }
+
+  set width (val) {
+    this.canvas.setAttribute('width', val)
+  }
+
+  get halfWidth () {
+    return this.width / 2.0
+  }
+
+  get halfHeight () {
+    return this.height / 2.0
+  }
+
+  get center () {
+    const x = this.canvas.width / 2
+    const y = this.canvas.height / 2
+
+    return { x, y }
+  }
+
+  setDimensions (width, height) {
+    this.height = height
+    this.width = width
+
+    this.emit('resize')
+  }
+
+  getTranslatedPosition (original) {
+    const x = this.center.x + (original.x - this.centeredOn.x)
+    const y = this.center.y + (original.y - this.centeredOn.y)
+
+    return { x, y }
+  }
+
+  boundingBox () {
+    const minX = this.centeredOn.x - (this.width / 2)
+    const minY = this.centeredOn.y - (this.height / 2)
+
+    const maxX = this.centeredOn.x + (this.width / 2)
+    const maxY = this.centeredOn.y + (this.height / 2)
+
+    return {
+      topLeft: { x: minX, y: minY },
+      bottomRight: { x: maxX, y: maxY }
+    }
+  }
 }

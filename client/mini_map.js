@@ -1,5 +1,8 @@
 module.exports = class MiniMap {
-  constructor (map) {
+  constructor (map, screen) {
+    this.screen = screen
+
+    this.screen.on('resize', () => this.updateSize())
     this.canvas = document.createElement('canvas')
     this.context = this.canvas.getContext('2d')
 
@@ -17,9 +20,17 @@ module.exports = class MiniMap {
     return (this.canvas.height / this.maxHeight)
   }
 
-  setCanvasSize (screen) {
-    this.canvas.width = screen.getWidth() * this.percent
-    this.canvas.height = screen.getWidth() * this.percent
+  get screenWidth () {
+    return this.screen.width
+  }
+
+  get screenHeight () {
+    return this.screen.height
+  }
+
+  updateSize () {
+    this.canvas.width = this.screenWidth * this.percent
+    this.canvas.height = this.screenHeight * this.percent
   }
 
   clear () {
@@ -33,13 +44,15 @@ module.exports = class MiniMap {
     this.context.restore()
   }
 
-  drawScreenOutline (screen) {
-    var width = this.adjustmentX * screen.getWidth() / 2
-    var height = this.adjustmentY * screen.getHeight() / 2
+  drawScreenOutline () {
+    var width = this.adjustmentX * this.screenWidth / 2
+    var height = this.adjustmentY * this.screenHeight / 2
 
     this.context.save()
     this.context.strokeStyle = '#00F'
-    this.translate(screen.centeredOn.x, screen.centeredOn.y)
+    this.translate(
+      this.screen.centeredOn.x,
+      this.screen.centeredOn.y)
 
     this.context.beginPath()
     this.context.moveTo(-width, -height)
