@@ -3,113 +3,121 @@ var intersects = require('./intersects')
 
 const { degreesToVector, vectorToDegrees, vectorToDistance } = require('./utils')
 
-module.exports = Rock
-
-function Rock () {
-  this.position = { x: 0, y: 0 }
-  this.color = '#FFF'
-  this.rotation = 0
-  this.rotationSpeed = 0
-  this.size = 10
-  this.vector = { x: 0, y: 0 }
-}
-
-Rock.prototype.setAttributesFromData = function (data) {
-  this.position = { x: data.x, y: data.y }
-  this.color = data.color
-  this.rotation = data.rotation
-  this.rotationSpeed = data.rotationSpeed
-  this.size = data.size
-  this.vector = data.vector
-}
-
-Rock.prototype.fromBulletImpact = function () {
-  if (this.size <= 10) return []
-
-  var rock1 = new Rock()
-  var rock2 = new Rock()
-
-  var degrees = vectorToDegrees(this.vector)
-  var distance = vectorToDistance(this.vector)
-
-  var vector1 = degreesToVector(degrees + 52, distance)
-  var vector2 = degreesToVector(degrees - 52, distance)
-
-  rock1.position = {
-    x: this.position.x + (vector1.x * this.size / 2),
-    y: this.position.y + (vector1.y * this.size / 2)
+module.exports = class Rock {
+  constructor () {
+    this.position = { x: 0, y: 0 }
+    this.color = '#FFF'
+    this.rotation = 0
+    this.rotationSpeed = 0
+    this.size = 10
+    this.vector = { x: 0, y: 0 }
   }
 
-  rock2.position = {
-    x: this.position.x + (vector2.x * this.size / 2),
-    y: this.position.y + (vector2.y * this.size / 2)
+  setAttributesFromData (data) {
+    this.position = { x: data.x, y: data.y }
+    this.color = data.color
+    this.rotation = data.rotation
+    this.rotationSpeed = data.rotationSpeed
+    this.size = data.size
+    this.vector = data.vector
   }
 
-  rock2.color = rock1.color = this.color
-  rock2.rotation = rock1.rotation = this.rotation
-  rock2.rotationSpeed = rock1.rotationSpeed = this.rotationSpeed
-  rock2.size = rock1.size = this.size / 2
+  fromBulletImpact () {
+    const {
+      position: { x, y },
+      size,
+      color,
+      rotation,
+      rotationSpeed
+    } = this
 
-  rock1.vector = vector1
-  rock2.vector = vector2
+    if (size <= 10) return []
 
-  return [rock1, rock2]
-}
+    const rock1 = new Rock()
+    const rock2 = new Rock()
 
-Rock.prototype.width = function () {
-  return this.size * 3
-}
+    const degrees = vectorToDegrees(this.vector)
+    const distance = vectorToDistance(this.vector)
 
-Rock.prototype.height = function () {
-  return this.size * 3
-}
+    const vector1 = degreesToVector(degrees + 52, distance)
+    const vector2 = degreesToVector(degrees - 52, distance)
 
-Rock.prototype.boundingBox = function () {
-  return boundingBox(this)
-}
+    rock1.position = {
+      x: x + (vector1.x * size / 2),
+      y: y + (vector1.y * size / 2)
+    }
 
-Rock.prototype.drawCollision = function (screen) {
-  this.draw(screen)
-}
+    rock2.position = {
+      x: x + (vector2.x * size / 2),
+      y: y + (vector2.y * size / 2)
+    }
 
-Rock.prototype.draw = function (screen) {
-  var self = this
+    rock2.color = rock1.color = color
+    rock2.rotation = rock1.rotation = rotation
+    rock2.rotationSpeed = rock1.rotationSpeed = rotationSpeed
+    rock2.size = rock1.size = size / 2
 
-  if (!intersects(this, screen)) return
+    rock1.vector = vector1
+    rock2.vector = vector2
 
-  screen.draw(function (context) {
-    var pos = this.getTranslatedPosition(self.position)
+    return [rock1, rock2]
+  }
 
-    context.fillStyle = self.color
-    context.translate(pos.x, pos.y)
-    context.beginPath()
+  width () {
+    return this.size * 3
+  }
 
-    context.rotate(self.rotation * (Math.PI / 180))
+  height () {
+    return this.size * 3
+  }
 
-    context.moveTo(-(self.size / 2), -self.size)
-    context.lineTo(self.size / 2, -self.size)
-    context.lineTo(self.size, -self.size / 2)
-    context.lineTo(self.size, self.size / 2)
-    context.lineTo(self.size / 2, self.size)
-    context.lineTo(-(self.size / 2), self.size)
-    context.lineTo(-self.size, self.size / 2)
-    context.lineTo(-self.size, -self.size / 2)
+  boundingBox () {
+    return boundingBox(this)
+  }
 
-    context.closePath()
-    context.fill()
-  })
-}
+  drawCollision (screen) {
+    this.draw(screen)
+  }
 
-Rock.prototype.move = function () {
-  this.position.x += this.vector.x
-  this.position.y += this.vector.y
-}
+  draw (screen) {
+    const { color, size, rotation, position } = this
 
-Rock.prototype.rotate = function () {
-  this.rotation = (this.rotation + this.rotationSpeed) % 360
-}
+    if (!intersects(this, screen)) return
 
-Rock.prototype.update = function () {
-  this.rotate()
-  this.move()
+    screen.draw(function (context) {
+      var pos = this.getTranslatedPosition(position)
+
+      context.fillStyle = color
+      context.translate(pos.x, pos.y)
+      context.beginPath()
+
+      context.rotate(rotation * (Math.PI / 180))
+
+      context.moveTo(-(size / 2), -size)
+      context.lineTo(size / 2, -size)
+      context.lineTo(size, -size / 2)
+      context.lineTo(size, size / 2)
+      context.lineTo(size / 2, size)
+      context.lineTo(-(size / 2), size)
+      context.lineTo(-size, size / 2)
+      context.lineTo(-size, -size / 2)
+
+      context.closePath()
+      context.fill()
+    })
+  }
+
+  move () {
+    this.position.x += this.vector.x
+    this.position.y += this.vector.y
+  }
+
+  rotate () {
+    this.rotation = (this.rotation + this.rotationSpeed) % 360
+  }
+
+  update () {
+    this.rotate()
+    this.move()
+  }
 }

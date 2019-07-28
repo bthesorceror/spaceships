@@ -49,7 +49,7 @@ module.exports = class MiniMap {
     var height = this.adjustmentY * this.screenHeight / 2
 
     this.context.save()
-    this.context.strokeStyle = '#00F'
+    this.context.strokeStyle = '#F00'
     this.translate(
       this.screen.centeredOn.x,
       this.screen.centeredOn.y)
